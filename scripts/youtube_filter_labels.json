@@ -1,0 +1,154 @@
+{
+ "_doc": "Rótulos manuais (autor do filtro). positivos = grupos realmente mencionados; ausente = ruído. ambiguos = casos que mudam se citação de passagem contar.",
+ "positivos": {
+  "saLR_t6IX6c": [
+   "concorrente_b",
+   "marca"
+  ],
+  "AQ7IVc4TTE4": [
+   "marca"
+  ],
+  "Nnk-j1PYtzM": [
+   "marca"
+  ],
+  "Jgb2xHanhEk": [
+   "concorrente_a",
+   "marca"
+  ],
+  "8umWJwaJMXk": [
+   "marca"
+  ],
+  "TjPbtf4UskQ": [
+   "marca"
+  ],
+  "Gq7y44gZa20": [
+   "marca"
+  ],
+  "ibRbos9S2ZQ": [
+   "concorrente_a"
+  ],
+  "8gkf8spfOp8": [
+   "concorrente_a"
+  ],
+  "cHqz6I-84vY": [
+   "concorrente_a"
+  ],
+  "N71FyGNK-Rg": [
+   "concorrente_a"
+  ],
+  "XD3VGFiL-R0": [
+   "concorrente_a"
+  ],
+  "z3H79OMbJyQ": [
+   "concorrente_b"
+  ],
+  "pSxIGdTsYCM": [
+   "concorrente_b"
+  ],
+  "PAY1v_fRcXM": [
+   "concorrente_b"
+  ],
+  "BKX8xdsU-E4": [
+   "concorrente_b"
+  ],
+  "hyef8nG1nR0": [
+   "concorrente_b"
+  ],
+  "NhckNFef5vY": [
+   "concorrente_b"
+  ],
+  "9JMWcQptHeo": [
+   "concorrente_a",
+   "concorrente_b",
+   "marca"
+  ],
+  "WBMKo8BvvRw": [
+   "concorrente_b"
+  ],
+  "wqmiKtXy3P0": [
+   "marca"
+  ],
+  "47cW58RLGEA": [
+   "concorrente_a",
+   "concorrente_b",
+   "marca"
+  ],
+  "QaxTXva8TN0": [
+   "marca"
+  ],
+  "Jglnqkz9MjA": [
+   "concorrente_a"
+  ],
+  "6pD5Ny_32lQ": [
+   "concorrente_a",
+   "concorrente_b",
+   "marca"
+  ],
+  "YL0i0EPd778": [
+   "concorrente_a"
+  ],
+  "wkUssBHki_E": [
+   "concorrente_a"
+  ],
+  "QkFnOdioR08": [
+   "concorrente_a",
+   "concorrente_b",
+   "marca"
+  ],
+  "Bipz7yXUkks": [
+   "concorrente_a"
+  ],
+  "WMUGlkAT9No": [
+   "concorrente_a"
+  ],
+  "656s20sYKcU": [
+   "concorrente_a"
+  ],
+  "2r27bOn0MvY": [
+   "concorrente_b"
+  ],
+  "kUhJeSC4ViU": [
+   "concorrente_b"
+  ],
+  "qFCDl9IaZ_o": [
+   "concorrente_b"
+  ],
+  "O7KKM49RDbY": [
+   "marca"
+  ],
+  "y_90zz33nbA": [
+   "concorrente_a"
+  ],
+  "L3I8WhTyoyA": [
+   "concorrente_a"
+  ],
+  "fkd2xRfM-b0": [
+   "concorrente_a"
+  ],
+  "FmQA31MQL3E": [
+   "concorrente_a"
+  ],
+  "NTSm1GBwWQ4": [
+   "concorrente_b"
+  ]
+ },
+ "ambiguos": {
+  "LvBnljp6oTk": [
+   "marca"
+  ],
+  "j4e6WMfPOqI": [
+   "concorrente_b"
+  ],
+  "dFnp-Q0LpRc": [
+   "concorrente_a",
+   "concorrente_b",
+   "marca"
+  ],
+  "BJxkrtzOxrU": [
+   "marca"
+  ],
+  "VOQZ_tKddqc": [
+   "concorrente_a"
+  ]
+ }
+}

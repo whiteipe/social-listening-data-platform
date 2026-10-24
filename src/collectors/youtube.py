@@ -64,7 +64,7 @@ def collect(days: int = 1) -> list[dict]:
                     foreign += 1
                     continue
                 text = html.unescape(f'{sn["title"]}. {sn.get("description", "")}')
-                groups = match_groups(text)
+                groups = match_groups(text, title=html.unescape(sn["title"]))
                 if not groups or vid in seen:
                     skipped += 0 if vid in seen else 1
                     continue

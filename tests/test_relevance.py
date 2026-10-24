@@ -24,3 +24,13 @@ from src.common.relevance import match_groups
 ])
 def test_match_groups(text, expected):
     assert sorted(match_groups(text)) == sorted(expected)
+
+
+def test_loose_brand_must_be_in_title_not_only_in_description():
+    desc_only = "Nucel entra no mercado. Concorrente de Claro, Vivo e TIM: plano de internet barato"
+    assert match_groups(desc_only, title="35GB de internet: nova aposta da Nucel") == []
+    assert match_groups(desc_only, title="Vivo contra Nucel") == ["marca"]
+
+
+def test_strict_match_still_works_from_description_when_title_is_given():
+    assert match_groups("Vídeo. Teste da operadora Vivo", title="Teste de velocidade") == ["marca"]
