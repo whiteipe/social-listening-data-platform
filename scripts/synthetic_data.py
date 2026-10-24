@@ -33,9 +33,11 @@ from pathlib import Path
 
 import numpy as np
 
+from scripts.synthetic_ga4 import iter_ga4_days, write_shards
+
 SEED_PARAMS_VERSION = "1.1"
 DEFAULT_AS_OF = date(2026, 10, 24)  # fixo: mesmo seed + as_of = mesmos dados (os eventos abaixo são de 2026)
-WINDOW_DAYS = 120
+WINDOW_DAYS = 150
 INJECTED_LAG_DAYS = 3
 GROUPS = {"marca": 1.0, "concorrente_a": 0.62, "concorrente_b": 0.50}
 GROUP_LABEL = {"marca": "Vivo", "concorrente_a": "Claro", "concorrente_b": "TIM"}
@@ -48,8 +50,6 @@ HOLIDAYS = {date(2026, 9, 7), date(2026, 10, 12)}
 HOLIDAY_FACTOR = 0.75
 CRISIS = (date(2026, 9, 30), date(2026, 10, 2))   # janela de crise da marca (Brasília)
 CRISIS_VOLUME_X = 2.5
-COLLECTION_GAP = {date(2026, 9, 2)}               # coletor de menções falhou o dia todo
-GA4_OUTAGE = {date(2026, 8, 28), date(2026, 8, 29)}
 BOT_DAYS = {date(2026, 8, 14): 6.0, date(2026, 9, 19): 6.0}
 GSC_LAG_DAYS = 2            # último dia disponível = as_of - 2
 GSC_PRELIM_DAYS = 3         # os 3 últimos dias disponíveis são preliminares
@@ -113,7 +113,14 @@ class SyntheticData:
     trends_daily: list[dict] = field(default_factory=list)
     social_daily: list[dict] = field(default_factory=list)
     gsc: list[dict] = field(default_factory=list)
-    ga4: list[dict] = field(default_factory=list)
+    ga4_plan: dict = field(default_factory=dict)  # o export GA4 é gerado dia a dia (streaming), não em lista
+
+    def iter_ga4(self):
+        """Itera (data, eventos do dia) no formato bruto do export GA4."""
+        p = self.ga4_plan
+        return iter_ga4_days(
+            p["days"], p["demand"], self.as_of, p["seed"], _calendar_factor,
+            lambda d: _campaign_factor(d, p["campaigns"]), BOT_DAYS, GA4_DENIED_SHARE)
 
 
 BOOSTS = {"awareness": 0.45, "consideracao": 0.30, "engajamento": 0.20}
@@ -174,9 +181,6 @@ def generate(scenario: str = "realistic", as_of: date | None = None, seed: int =
             for d in days]) * noise
     counts = {g: rng.poisson(lam[g]) for g in GROUPS}
     for i, d in enumerate(days):
-        if d in COLLECTION_GAP:
-            for g in GROUPS:
-                counts[g][i] = 0
         if d == as_of:  # dia corrente parcial
             for g in GROUPS:
                 counts[g][i] = int(counts[g][i] * LAST_DAY_HOURS / 24)
@@ -187,9 +191,7 @@ def generate(scenario: str = "realistic", as_of: date | None = None, seed: int =
     # --- demanda de busca de marca (S) ----------------------------------------------------
     m_series = counts["marca"].astype(float)
     if scenario == "lag3":
-        valid = np.array([d not in COLLECTION_GAP for d in days])
-        mu, sd = m_series[valid].mean(), m_series[valid].std()
-        z = np.where(valid, (m_series - mu) / sd, 0.0)
+        z = (m_series - m_series.mean()) / m_series.std()
         z_lag = np.concatenate([np.zeros(INJECTED_LAG_DAYS), z[:-INJECTED_LAG_DAYS]])
         demand = 900.0 * np.clip(1.0 + 0.8 * z_lag, 0.15, None) * np.exp(rng.normal(0, 0.05, n))
     else:
@@ -199,7 +201,7 @@ def generate(scenario: str = "realistic", as_of: date | None = None, seed: int =
 
     _gen_trends(out, rng, days, demand, lam, scenario)
     _gen_gsc(out, rng, days, demand, as_of)
-    _gen_ga4(out, rng, days, demand, as_of, campaigns)
+    out.ga4_plan = {"days": days, "demand": demand, "seed": seed, "campaigns": campaigns}
     _gen_social_daily(out, rng, days)
     return out
 
@@ -332,30 +334,6 @@ def _gen_gsc(out: SyntheticData, rng, days, demand, as_of) -> None:
         })
 
 
-def _gen_ga4(out: SyntheticData, rng, days, demand, as_of, campaigns) -> None:
-    for i, d in enumerate(days):
-        if d in GA4_OUTAGE or d >= as_of:  # export do dia corrente só no dia seguinte
-            continue
-        cal = _calendar_factor(d)
-        direct = (300.0 * cal * np.exp(rng.normal(0, 0.08)) + 0.15 * demand[i]) * BOT_DAYS.get(d, 1.0)
-        organic = 0.55 * demand[i] + 500 * cal
-        paid = 250.0 * cal * _campaign_factor(d, campaigns)
-        sessions = {"(none)": direct, "organic": organic, "cpc": paid}
-        for medium, val in sessions.items():
-            val = val * rng.uniform(0.97, 1.03)  # amostragem/ruído de medição
-            denied = int(val * GA4_DENIED_SHARE)
-            for state, v in (("granted", int(val) - denied), ("denied", denied)):
-                out.ga4.append({"event_date": d.strftime("%Y%m%d"), "event_name": "session_start",
-                                "traffic_medium": medium, "consent_state": state, "event_count": v,
-                                "is_synthetic": True, "_loaded_at": _loaded_at(d + timedelta(days=1))})
-        bot = BOT_DAYS.get(d, 1.0) > 1
-        new_users = int(0.30 * (organic + paid) + (0 if bot else 0.30 * direct)) * (1 - GA4_DENIED_SHARE)
-        out.ga4.append({"event_date": d.strftime("%Y%m%d"), "event_name": "first_visit",
-                        "traffic_medium": "(none)", "consent_state": "granted",
-                        "event_count": int(new_users), "is_synthetic": True,
-                        "_loaded_at": _loaded_at(d + timedelta(days=1))})
-
-
 def _gen_social_daily(out: SyntheticData, rng, days) -> None:
     subs = 120_000.0
     for d in days:
@@ -364,10 +342,10 @@ def _gen_social_daily(out: SyntheticData, rng, days) -> None:
                                  "value": float(round(subs)), "_loaded_at": _loaded_at(d)})
 
 
-TABLES = ("mentions", "mention_labels", "trends_daily", "social_daily", "gsc", "ga4")
+TABLES = ("mentions", "mention_labels", "trends_daily", "social_daily", "gsc")
 
 
-def write(data: SyntheticData, out_dir: Path, seed: int) -> Path:
+def write(data: SyntheticData, out_dir: Path, seed: int, ga4: bool = True) -> Path:
     """Grava um JSONL por tabela + campaign_calendar.csv + manifest.json. Só arquivos locais."""
     target = Path(out_dir) / data.scenario
     target.mkdir(parents=True, exist_ok=True)
@@ -382,9 +360,10 @@ def write(data: SyntheticData, out_dir: Path, seed: int) -> Path:
         channel, objective = CAMPAIGN_META[c.campaign_id]
         lines.append(f"{c.campaign_id},{c.name},{channel},{objective},{c.start},{c.end},true")
     (target / "campaign_calendar.csv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    ga4_stats = write_shards(data.iter_ga4(), target / "ga4") if ga4 else None
     manifest = {"is_synthetic": True, "scenario": data.scenario, "seed": seed,
                 "as_of": data.as_of.isoformat(),
-                "params_version": SEED_PARAMS_VERSION, "window_days": WINDOW_DAYS, "row_counts": counts,
+                "params_version": SEED_PARAMS_VERSION, "window_days": WINDOW_DAYS, "row_counts": counts, "ga4_export": ga4_stats,
                 "injected_lag_days": INJECTED_LAG_DAYS if data.scenario == "lag3" else None}
     (target / "manifest.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8")
     return target
@@ -396,9 +375,10 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--as-of", type=date.fromisoformat, default=DEFAULT_AS_OF)
     ap.add_argument("--out", default="data/synthetic")
+    ap.add_argument("--skip-ga4", action="store_true", help="pula o export GA4 (o mais pesado)")
     args = ap.parse_args()
     for sc in (["realistic", "lag3"] if args.scenario == "both" else [args.scenario]):
-        path = write(generate(sc, args.as_of, args.seed), Path(args.out), args.seed)
+        path = write(generate(sc, args.as_of, args.seed), Path(args.out), args.seed, ga4=not args.skip_ga4)
         print(f"[{sc}] {path}: {(path / 'manifest.json').read_text(encoding='utf-8')[:0]}ok")
 
 

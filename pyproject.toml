@@ -16,3 +16,4 @@ pythonpath = ["."]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E501"]  # asserts com literais longos
+"scripts/synthetic_*.py" = ["E501"]  # tabelas de parâmetros e schema
