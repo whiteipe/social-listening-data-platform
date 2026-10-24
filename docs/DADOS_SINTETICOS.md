@@ -72,7 +72,7 @@ não uma meta definida antes.
   ao configurarmos o dbt.
 - **Rótulos perfeitos:** o sentimento sintético segue o texto por construção. **Não usar para o bake-off de
   classificadores** (Laya, JEV, baseline): ele exige rótulos humanos de texto real.
-- **Eventos com datas fixas de 2026:** com outro `--as-of` fora da janela, as campanhas, a crise e as lacunas
+- **Eventos com datas fixas de 2026:** com outro `--as-of` fora da janela, as campanhas, a crise e os picos de bot
   saem do período.
 - **GSC continua em formato simplificado** (o export real `searchdata_site_impression` tem outras colunas); só o GA4 foi levado ao formato bruto.
 - O gerador é um modelo simples (Poisson com ruído AR(1)): não captura memes, viralização, bots coordenados
