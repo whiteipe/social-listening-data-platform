@@ -22,6 +22,9 @@ match_loose:
   marca: '(?i)(?<!ao )\bvivo\b'
   concorrente_a: '\b(Claro|CLARO)\b'
   concorrente_b: '\bTIM\b'
+# Contexto de telecom: com a marca "solta" (match_loose) o texto só vale se também tiver uma destas palavras
+# em qualquer posição. Mais robusto que exigir o qualificador colado à marca ("Claro e Vivo", "chip Claro").
+context: '(?i)\b(operadora|chip|planos?|internet|fibra|celular|5g|4g|telefonia|recarga|roaming|wi-?fi|roteador|banda larga|p[oó]s-?pago|pr[eé]-?pago|controle|streamings?|combo|cobertura|sinal|fidelidade|portabilidade|pacote|smartphone|mobile)\b'
 hashtags:                # só Instagram (fora da v1)
   marca: [vivo]
   concorrente_a: [claro]

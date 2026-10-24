@@ -13,6 +13,12 @@ from src.common.relevance import match_groups
     ("Show AO VIVO hoje", []),
     ("Claro que sim, vamos nessa", []),
     ("Tim Maia no palco", []),
+    ("Internet de 1Gbps por R$79: minha experiência com Claro e Vivo", ["marca", "concorrente_a"]),
+    ("CHIP CLARO GRÁTIS + INTERNET + LIGAÇÕES ILIMITADAS", ["concorrente_a"]),
+    ("TIM Play mudou tudo: 9 streamings em um só pacote", ["concorrente_b"]),
+    ("MELHOR PLANO DE INTERNET (TIM, CLARO E VIVO)", ["marca", "concorrente_a", "concorrente_b"]),
+    ("ODEON E VIVO com problema no BTV: e agora?", []),
+    ("Transmissão ao vivo do show de domingo, internet caiu", []),
     ("", []),
     (None, []),
 ])

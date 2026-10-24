@@ -67,7 +67,9 @@ def test_google_news_loose_match_applies_only_to_searched_group():
     responses.add(responses.GET, google_news.BASE, body=body, status=200)
     got = {(r["query_group"], r["text"]) for r in google_news.collect()}
     assert ("marca", "Vivo anuncia 5G em mais cidades") in got   # busca do grupo marca: regex solto vale
-    assert not any(t.startswith("TIM anuncia") for _, t in got)  # TIM não é o grupo buscado
+    # "TIM" solta + contexto ("plano"): vale como menção da TIM, nunca da marca buscada
+    assert ("concorrente_b", "TIM anuncia plano novo") in got
+    assert ("marca", "TIM anuncia plano novo") not in got
 
 
 @responses.activate
