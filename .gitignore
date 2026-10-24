@@ -2,3 +2,13 @@
 node_modules/
 __pycache__/
 .venv/
+data/
+target/
+dbt_packages/
+logs/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dbt/profiles.yml
+
+.claude/

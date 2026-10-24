@@ -1,0 +1,33 @@
+# Marca proxy: telecom (Vivo vs Claro vs TIM). Termos qualificados porque
+# "vivo", "claro" e "tim" são palavras comuns em português ("ao vivo", "claro que sim").
+query_groups:            # busca textual (YouTube, Google News)
+  marca:
+    - '"operadora Vivo"'
+    - '"Vivo Fibra"'
+  concorrente_a:
+    - '"operadora Claro"'
+    - '"Claro Net"'
+  concorrente_b:
+    - '"operadora TIM"'
+    - '"TIM Controle"'
+# Regex de relevância por grupo: a busca das plataformas é fuzzy (o YouTube ignora aspas),
+# então só vira menção o texto que casa com o grupo. Um texto pode casar com mais de um.
+match:
+  marca: '(?i)(operadora\s+vivo|\bvivo\s+(fibra|internet|m[oó]vel|easy|empresas|controle|telefonia)|telef[oô]nica\s*[/-]?\s*vivo)'
+  concorrente_a: '(?i)(operadora\s+claro|\bclaro\s+(net|internet|m[oó]vel|tv|controle|empresas|brasil))'
+  concorrente_b: '(?i)(operadora\s+tim|\btim\s+(brasil|controle|black|beta|ultrafibra|empresas|celular))'
+# Regex mais solto, aplicado SÓ ao grupo da própria busca e só em fontes cuja busca já
+# delimita o assunto (notícias): títulos dizem apenas "Vivo anuncia...", sem "operadora".
+match_loose:
+  marca: '(?i)(?<!ao )\bvivo\b'
+  concorrente_a: '\b(Claro|CLARO)\b'
+  concorrente_b: '\bTIM\b'
+hashtags:                # só Instagram (fora da v1)
+  marca: [vivo]
+  concorrente_a: [claro]
+  concorrente_b: [timbrasil]
+trends_terms: [operadora vivo, operadora claro, operadora tim]   # 2 a 5 por chamada, mesma consulta
+geo: BR
+# Marcas nacionais: filtro de país e idioma aplicado nas fontes que suportam.
+region: BR
+language: pt

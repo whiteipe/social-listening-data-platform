@@ -1,0 +1,10 @@
+brand_health:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: SEU_PROJETO_GCP
+      dataset: social_listening_data_platform
+      location: US
+      threads: 4

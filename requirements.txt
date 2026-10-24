@@ -1,0 +1,13 @@
+requests
+tenacity
+typer
+pyyaml
+python-dateutil
+python-dotenv
+pandas
+google-cloud-bigquery
+google-api-python-client
+trendspyg
+praw
+anthropic
+dbt-bigquery

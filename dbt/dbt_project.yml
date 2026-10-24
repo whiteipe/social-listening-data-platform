@@ -1,0 +1,17 @@
+name: brand_health
+version: "0.1.0"
+profile: brand_health
+config-version: 2
+seed-paths: ["seeds"]
+model-paths: ["models"]
+macro-paths: ["macros"]
+vars:
+  brand_regex: '(?i)(\bvivo\b)'   # aspas simples: barra literal no YAML
+  brand_term: "operadora vivo"
+  gsc_dataset: social_listening_data_platform   # sintético no dataset único (is_synthetic = true)
+  ga4_dataset: social_listening_data_platform
+models:
+  brand_health:
+    staging:      {+materialized: view}
+    intermediate: {+materialized: view}
+    marts:        {+materialized: table}
