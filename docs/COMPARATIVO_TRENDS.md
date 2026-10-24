@@ -65,9 +65,9 @@ As estrelas dizem popularidade, não saúde.
 O Chrome fica só como reserva (o runner `ubuntu-latest` do GitHub Actions tem; a imagem Docker precisará instalar).
 A função `collect()` isola a biblioteca, então trocar de backend é mudar um arquivo.
 
-**API oficial:** candidatura ao alpha **ainda não enviada**. O formulário exige URL de GitHub/portfólio, que falta.
-Campos já definidos: desenvolvedor independente, uso não comercial, feedback por e-mail, projeto GCP
-`SEU_PROJETO_GCP`. Se aprovada, refazer este comparativo e avaliar migrar, principalmente pela escala consistente.
+**API oficial:** candidatura ao alpha enviada em 24/10/2026 (desenvolvedor independente, uso não comercial,
+feedback por e-mail). Sem resposta até agora; o Google avisa só se aceitar. Se aprovada, refazer este comparativo e
+avaliar migrar, principalmente pela escala consistente.
 
 Fontes: PyPI e API do GitHub (consulta de 24/10/2026), página oficial do alpha
 (developers.google.com/search/apis/trends) e testes executados neste repositório.
