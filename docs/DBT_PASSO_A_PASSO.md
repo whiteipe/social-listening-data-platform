@@ -33,8 +33,8 @@ e as transforma com `SELECT`, na ordem certa, com testes.
 repositório**, porque descreve a máquina de quem roda (e pode ter credenciais).
 
 **Fazer:**
-1. **Fixar a versão estável.** O ambiente veio com `dbt-core 1.13.0b1` (beta). Para aprender e para o CI não quebrar
-   com mudanças de beta: `pip install "dbt-core==1.12.6" "dbt-bigquery==1.12.1"` e fixar o mesmo em `requirements.txt`.
+1. **Versão estável fixada (feito).** O ambiente tinha vindo com `dbt-core 1.13.0b1` (beta). Agora `requirements.txt` fixa
+   `dbt-core==1.12.6` e `dbt-bigquery==1.12.1`; `dbt --version` mostra "Up to date".
 2. **Decisão: onde rodar os testes.** Recomendo um dataset separado, `social_listening_sandbox`:
    o dbt cria e apaga objetos à vontade e não toca o dataset real, que fica para dado real. Ver "Dev e prod" no passo 18.
 3. Criar `~/.dbt/profiles.yml` a partir de `dbt/profiles.yml.example`, com `method: oauth` (usa o login do `gcloud`),
@@ -153,10 +153,12 @@ Cuidado: o GSC pode ter várias versões da mesma `data_date`; guardar a mais re
 ### [ ] 10. `stg_ga4_sessions`: sessionizar o export bruto
 
 **Por quê:** é o ponto mais importante e mais fácil de errar. O export do GA4 tem **uma linha por evento**, não por sessão.
-Duas armadilhas:
-- `traffic_source.medium` é o **first touch do usuário**, não o meio da sessão. O `stg_ga4_brand` do README usa esse campo
-  para "sessão direta", o que está errado.
-- O meio da sessão vem de `event_params` (`source`, `medium`) ou de `session_traffic_source_last_click`.
+Armadilhas (o SQL original do prompt, em `CLAUDE.md`, errava nelas; já foi corrigido lá):
+- `traffic_source.medium` é o **first touch do usuário**, não o meio da sessão. O meio da sessão vem de `event_params`
+  (`source`, `medium`) ou de `session_traffic_source_last_click`.
+- `or traffic_source.medium is null` contava como "direto" todo evento **sem consentimento** (o campo vem nulo).
+- `events_*` também casa `events_intraday_*` e duplicaria o dia corrente: filtrar `_table_suffix` por 8 dígitos.
+- Janela com `current_date()` não é reproduzível: usar a variável `ga4_start_date`.
 
 **Fazer:** ler as tabelas fragmentadas com `events_*` filtrando `_TABLE_SUFFIX` (**para o BigQuery ler só os dias
 necessários e não gerar custo**); `UNNEST(event_params)` para extrair `ga_session_id` e `medium`; definir a sessão como

@@ -853,14 +853,42 @@ group by 1
 
 **`staging/stg_ga4_brand.sql`** (sessões diretas e novos usuários, do export do GA4; ajuste ao seu dataset)
 
+> **Corrigido em relação à versão original do prompt.** O export do GA4 tem uma linha por **evento**, não por sessão, e
+> a versão original errava em quatro pontos: (1) usava `traffic_source.medium`, que é o **first touch do usuário** e não o
+> meio da sessão; (2) `or traffic_source.medium is null` contava como "direto" todo evento sem consentimento;
+> (3) `events_*` também casa `events_intraday_*` (e `'intraday_...' >= '2026...'` é verdadeiro em texto), duplicando o dia
+> corrente; (4) a janela com `current_date()` não é reproduzível. A lógica abaixo foi testada em dados de exemplo; ainda
+> falta validá-la contra o export real (passo 10 de `docs/DBT_PASSO_A_PASSO.md`).
+
 ```sql
+-- Sessão = (user_pseudo_id, ga_session_id). O meio da sessão vem de event_params, não de traffic_source.
+-- Consentimento negado chega sem user_pseudo_id (hipótese: a documentação não detalha): fica fora das sessões.
+with events as (
+  select
+    parse_date('%Y%m%d', event_date) as date,
+    user_pseudo_id,
+    event_name,
+    (select value.int_value from unnest(event_params) where key = 'ga_session_id') as ga_session_id,
+    (select value.string_value from unnest(event_params) where key = 'medium') as medium
+  from `{{ target.project }}.{{ var('ga4_dataset') }}.events_*`
+  where regexp_contains(_table_suffix, r'^\d{8}$')            -- só tabelas diárias, exclui events_intraday_*
+    and _table_suffix >= '{{ var("ga4_start_date", "20200101") }}'  -- limita os dias lidos (custo) de forma reproduzível
+),
+sessions as (
+  select
+    date, user_pseudo_id, ga_session_id,
+    max(medium) as session_medium,                            -- 'medium' vem em session_start / 1ª page_view
+    logical_or(event_name = 'first_visit') as is_new_user
+  from events
+  where user_pseudo_id is not null and ga_session_id is not null
+  group by 1, 2, 3
+)
 select
-  parse_date('%Y%m%d', event_date) as date,
-  countif(event_name = 'session_start'
-          and (traffic_source.medium in ('(none)', 'direct') or traffic_source.medium is null)) as direct_sessions,
-  countif(event_name = 'first_visit') as new_users
-from `{{ target.project }}.{{ var('ga4_dataset') }}.events_*`
-where _table_suffix >= format_date('%Y%m%d', date_sub(current_date(), interval 120 day))
+  date,
+  count(*) as sessions,
+  countif(session_medium = '(none)') as direct_sessions,
+  countif(is_new_user) as new_users
+from sessions
 group by 1
 ```
 

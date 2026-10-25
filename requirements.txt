@@ -10,4 +10,5 @@ google-api-python-client
 trendspyg
 praw
 anthropic
-dbt-bigquery
+dbt-core==1.12.6
+dbt-bigquery==1.12.1
