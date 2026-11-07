@@ -9,9 +9,9 @@ dbt-core + dbt-bigquery, comparado com Dagster, Dataform e SQL puro.
 
 Orquestração: GitHub Actions cron (revisitar na Fase 4).
 
-## Dataset único
-Tudo em `social_listening_data_platform`. Camadas por prefixo de tabela: raw (nomes originais), `stg_*`, `int_*`, `mart_*`.
-O macro `generate_schema_name` força o dataset do target. Perde-se permissão por camada.
+## Um dataset por camada
+`raw` (Python grava), `stg`, `int` e `mart` (dbt grava). Permite permissão e retenção por camada.
+`BQ_DATASET_PREFIX` isola o sandbox (`sandbox_raw`, `sandbox_stg`...). O macro `generate_schema_name` usa o `+schema` da camada no target `prod` e `<dataset do target>_<camada>` nos demais.
 
 ## Dados
 Marca proxy real (setor delivery/apps); GSC/GA4 sintéticos (flag `is_synthetic`). Ver `docs/LIMITATIONS.md`.

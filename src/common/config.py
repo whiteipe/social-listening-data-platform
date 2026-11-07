@@ -9,7 +9,7 @@ load_dotenv()
 
 class Settings:
     gcp_project = os.environ.get("GCP_PROJECT", "")
-    bq_dataset = os.environ.get("BQ_DATASET", "social_listening_data_platform")
+    bq_dataset_prefix = os.environ.get("BQ_DATASET_PREFIX", "")
     bq_location = os.environ.get("BQ_LOCATION", "US")
     salt = os.environ.get("AUTHOR_HASH_SALT", "")
     meta_graph_version = os.environ.get("META_GRAPH_VERSION", "v21.0")
@@ -23,6 +23,10 @@ class Settings:
     slack_webhook = os.environ.get("SLACK_WEBHOOK_URL", "")
     sentiment_backend = os.environ.get("SENTIMENT_BACKEND", "hf")
     llm_model = os.environ.get("LLM_MODEL", "claude-haiku-5-5")
+
+    @property
+    def raw_dataset(self) -> str:
+        return f"{self.bq_dataset_prefix}raw"
 
 
 settings = Settings()

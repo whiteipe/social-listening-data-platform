@@ -46,7 +46,7 @@ def upsert(table: str, rows: list[dict]) -> int:
         return 0
     rows = _dedupe(table, rows)
     client = bigquery.Client(project=settings.gcp_project, location=settings.bq_location)
-    dataset = f"{settings.gcp_project}.{settings.bq_dataset}"
+    dataset = f"{settings.gcp_project}.{settings.raw_dataset}"
     staging = f"{dataset}._stg_{table}_{uuid.uuid4().hex[:8]}"
     try:
         client.load_table_from_json(

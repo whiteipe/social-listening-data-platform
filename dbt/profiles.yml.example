@@ -5,6 +5,13 @@ brand_health:
       type: bigquery
       method: oauth
       project: SEU_PROJETO_GCP
-      dataset: social_listening_data_platform
+      dataset: sandbox   # dbt cria sandbox_stg, sandbox_int, sandbox_mart
+      location: US
+      threads: 4
+    prod:                 # só com dado real: datasets raw, stg, int e mart
+      type: bigquery
+      method: oauth
+      project: SEU_PROJETO_GCP
+      dataset: raw
       location: US
       threads: 4

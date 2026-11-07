@@ -1,5 +1,5 @@
 -- Menções públicas de qualquer fonte (formato único)
-CREATE TABLE IF NOT EXISTS `${PROJECT}.${DATASET}.mentions` (
+CREATE TABLE IF NOT EXISTS `${PROJECT}.${RAW}.mentions` (
   source       STRING    NOT NULL,   -- instagram_hashtag | youtube_video | youtube_comment | reddit | x | news
   mention_id   STRING    NOT NULL,   -- chave natural dentro da fonte
   published_at TIMESTAMP NOT NULL,
@@ -18,7 +18,7 @@ PARTITION BY date
 CLUSTER BY source, query_group;
 
 -- Métricas diárias de contas próprias e séries agregadas
-CREATE TABLE IF NOT EXISTS `${PROJECT}.${DATASET}.social_daily` (
+CREATE TABLE IF NOT EXISTS `${PROJECT}.${RAW}.social_daily` (
   date        DATE   NOT NULL,
   platform    STRING NOT NULL,       -- instagram | youtube | gdelt
   metric      STRING NOT NULL,       -- reach | views | subscribers | news_tone:marca ...
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `${PROJECT}.${DATASET}.social_daily` (
 PARTITION BY date;
 
 -- Google Trends (interesse relativo 0-100)
-CREATE TABLE IF NOT EXISTS `${PROJECT}.${DATASET}.trends_daily` (
+CREATE TABLE IF NOT EXISTS `${PROJECT}.${RAW}.trends_daily` (
   date        DATE   NOT NULL,
   term        STRING NOT NULL,
   geo         STRING NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `${PROJECT}.${DATASET}.trends_daily` (
 PARTITION BY date;
 
 -- Resultado do NLP (um registro por menção)
-CREATE TABLE IF NOT EXISTS `${PROJECT}.${DATASET}.mention_labels` (
+CREATE TABLE IF NOT EXISTS `${PROJECT}.${RAW}.mention_labels` (
   source          STRING NOT NULL,
   mention_id      STRING NOT NULL,
   date            DATE   NOT NULL,

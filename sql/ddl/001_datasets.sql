@@ -1,4 +1,5 @@
--- Dataset único: raw, stg, int e mart convivem por prefixo de tabela.
--- Tabelas raw mantêm o nome (mentions, social_daily, trends_daily, mention_labels).
-CREATE SCHEMA IF NOT EXISTS `${PROJECT}.${DATASET}`
-OPTIONS (location = '${LOCATION}');
+-- Um dataset por camada: raw (Python grava), stg, int e mart (dbt grava).
+CREATE SCHEMA IF NOT EXISTS `${PROJECT}.${RAW}` OPTIONS (location = '${LOCATION}');
+CREATE SCHEMA IF NOT EXISTS `${PROJECT}.${STG}` OPTIONS (location = '${LOCATION}');
+CREATE SCHEMA IF NOT EXISTS `${PROJECT}.${INT}` OPTIONS (location = '${LOCATION}');
+CREATE SCHEMA IF NOT EXISTS `${PROJECT}.${MART}` OPTIONS (location = '${LOCATION}');

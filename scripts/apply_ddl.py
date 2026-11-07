@@ -8,8 +8,10 @@ from src.common.config import settings
 
 
 def render(sql: str) -> str:
+    p = settings.bq_dataset_prefix
     return (sql.replace("${PROJECT}", settings.gcp_project)
-               .replace("${DATASET}", settings.bq_dataset)
+               .replace("${RAW}", f"{p}raw").replace("${STG}", f"{p}stg")
+               .replace("${INT}", f"{p}int").replace("${MART}", f"{p}mart")
                .replace("${LOCATION}", settings.bq_location))
 
 
